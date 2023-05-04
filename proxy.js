@@ -6,12 +6,12 @@ wss.on('connection', function connection(ws) {
   ws.on('error', console.error);
 
   ws.on('message', function message(data, isBinary) {
-    console.log("d " + data);
-    console.log(isBinary);
+    //console.log("d " + data);
+    //console.log(isBinary);
 
     wss.clients.forEach(function each(client) {
-      //client !== ws &&
-        if (client.readyState === WebSocket.OPEN) {
+      //
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
         client.send(data, { binary: isBinary });
       }
     });
