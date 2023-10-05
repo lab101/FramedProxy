@@ -10,7 +10,7 @@ var incomingDataLog = [];
 // escaped javascript text for reloading the page
 var reloadPage = "<script>setTimeout(function(){location.reload()}, 2000);</script>";
 // espcaped stylesheet for the page
-var styleSheet = "<style>body{font-family: monospace; font-size: 20px;}</style>";
+var styleSheet = "<style>body{font-family: monospace; font-size: 24px;}</style>";
 
 
 const server = express()
@@ -19,11 +19,11 @@ const server = express()
   
     res.setHeader('Content-Type', 'text/html');
 
-      var summrize = "active websockets:";
+      var summrize = "<h2>active websockets:</h2>";
       for (let client of wss.clients) {
-          summrize += client._socket.remoteAddress + "<br/>";
+          summrize += client.realip + "<br/>";
       }
-      summrize += "<br/>incoming data:<br/>";
+      summrize += "<br/><h2>incoming data:</h2>";
       for(var i = 0; i < incomingDataLog.length; i++){
         summrize += "<strong>" + incomingDataLog[i].key + "</strong>  ------  " + incomingDataLog[i].data + "<br/>";
       }
@@ -39,17 +39,17 @@ const wss = new WebSocket.Server({ server })
 
 
 
-wss.on('connection', function connection(ws) {
+wss.on('connection', function connection(ws,req) {
+
+
+  // get the real ip from the proxy
+  ws.realip = req.headers["x-real-ip"];
+
   ws.on('error', console.error);
-  //console.log("d");
 
-  ws.on('message', function message(data, isBinary) {
+  ws.on('message', function message(data, isBinary,req) {
 
-
-    //var adress = ws._socket.remoteAddress;
-
-    var adress = ws._socket.headers['X-Real-IP'] || ws._socket.connection.remoteAddress;
-
+    var adress =  ws.realip;
 
     var foundClient = false;
     for(var i = 0; i < incomingDataLog.length; i++){
@@ -73,3 +73,21 @@ wss.on('connection', function connection(ws) {
     });
   });
 });
+
+
+// clear non active clients from incomingDataLog
+setInterval(function(){
+  for(var i = 0; i < incomingDataLog.length; i++){
+    var found = false;
+    for (let client of wss.clients) {
+        if(client.realip == incomingDataLog[i].key){
+          found = true;
+          break;
+        }
+    }
+    if(!found){
+      incomingDataLog.splice(i,1);
+      i--;
+    }
+  }
+}, 1000);

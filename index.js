@@ -4,6 +4,10 @@ var osc = require("osc");
 
 var localIps = [];
 
+// set your socket url here
+var socketUrl = "ws://localhost:6006";
+
+
 // check local ip
 var net_int = os.networkInterfaces();
 var no_of_network_interfaces = 0;
@@ -23,11 +27,6 @@ for (var key in net_int) {
     });  
   }
   
-
-// allNetworkInterfaces.forEach(element => {
-//     console.log(element.address);
-// });
-//console.log(allNetworkInterfaces);
 
 
 var udpPort = new osc.UDPPort({
@@ -57,7 +56,7 @@ function tryConnect(){
         console.log("trying to connect to websocket");
 
         ws = 0;
-        ws = new WebSocket('ws://dot3.lab101.be:6000');
+        ws = new WebSocket(socketUrl);
         setupCallbacks();
 
         // ws.on('error', function error(msg){
@@ -127,7 +126,5 @@ udpPort.on("message", function (oscMsg, timeTag, info) {
 
 // Open the socket.
 udpPort.open();
-
-//console.log(udpPort);
 
 tryConnect();
