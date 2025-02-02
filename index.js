@@ -1,11 +1,11 @@
-const WebSocket = require('ws');
-var os = require('os');
-var osc = require("osc");
+import WebSocket, { WebSocketServer } from 'ws';
+import osc from 'osc';
+import os from 'os';
 
 var localIps = [];
 
 // set your socket url here
-var socketUrl = "ws://localhost:6006";
+var socketUrl = "ws://framedproxy.lab101.be";
 
 
 // check local ip
