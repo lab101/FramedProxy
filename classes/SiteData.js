@@ -1,10 +1,10 @@
 class SiteData {
   constructor() {
 
-    this.id = 0;
+    this.ip = 0;
     this.siteName = '';
     this.siteGeoLocation = '';
-
+    this.dataCount = 0;
   }
 
 
