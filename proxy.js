@@ -10,6 +10,7 @@ import SiteData from './classes/SiteData.js';
 const port = process.env.PORT || 6006
 const portMonitor = process.env.PORT || 6007
 
+let verboseMode = false;
 
 var activeSites = [];
 
@@ -23,9 +24,17 @@ wssMonitor.on('connection', function connection(ws) {
 });
 
 
+// check args for verbose -v flag
+if(process.argv.includes("-v")){
+  console.log("verbose mode");
+  verboseMode = true;
+}
 
 
-addSite("109.137.244.226");
+
+
+
+//addSite("109.137.244.226");
 
  
 function findSite(ip){
@@ -38,6 +47,7 @@ function findSite(ip){
 }
 
  function addSite(ip){
+    console.log("add site: " + ip);
     var site = new SiteData();
     site.ip = ip;
     site.siteGeoLocation =  lookup(site.ip);
@@ -46,6 +56,7 @@ function findSite(ip){
 }
 
 function removeSite(ip){
+  console.log("remove site: " + ip);
   for(var i = 0; i < activeSites.length; i++){
     if(activeSites[i].ip == ip){
       activeSites.splice(i,1);
@@ -64,8 +75,12 @@ function sendDataToMonitor(ip,action,data){
     message.action = action;
     message.ip = ip;
     message.data = data;
-    console.log(JSON.stringify(message));
-    client.send(JSON.stringify(message));
+
+    const stringMessage = JSON.stringify(message);
+    if(verboseMode){
+      console.log(stringMessage);
+    }
+    client.send(stringMessage);
   });
 }
 
@@ -89,7 +104,7 @@ var styleSheet = "<style>body{font-family: monospace; font-size: 24px;}</style>"
 
 const server = express()
   .use(express.static('public'))
-  .get('/', (req, res) => {
+  .get('/data', (req, res) => {
   
     res.setHeader('Content-Type', 'text/html');
 
@@ -98,7 +113,6 @@ const server = express()
         summerize += client.realip + "<br/>";
       }
       summerize += "<br/><h2>incoming data:</h2>";
-      console.log(activeSites);
       for(var i = 0; i < activeSites.length; i++){
         summerize += "<strong>" + activeSites[i].ip + "</strong>  ------  " + (activeSites[i].dataCount) + "<br/>";
       }
@@ -117,6 +131,8 @@ wss.on('connection', function connection(ws,req) {
   // get the real ip from the proxy
   ws.realip = req.headers["x-real-ip"];
 
+  addSite(ws.realip);
+
   ws.on('error', console.error);
 
   ws.on('close', function close() {
@@ -133,7 +149,9 @@ wss.on('connection', function connection(ws,req) {
     let oscMessage = osc.readPacket(data,{"metadata": true, "unpackSingleArgs": true});
     let fwdData = new Object();
     if(oscMessage.address == "/points"){
-      console.log(oscMessage.args);
+      if(verboseMode){
+        console.log("args on message " + oscMessage.args);
+      }
       let r = oscMessage.args[3].value;
       let g = oscMessage.args[4].value;
       let b = oscMessage.args[5].value;

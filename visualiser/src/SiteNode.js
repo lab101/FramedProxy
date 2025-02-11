@@ -1,3 +1,5 @@
+import { getHeight, getWidth } from "./helpers/CanvasHelper";
+
 class SideNode{
     constructor(){
         this.id = 0;
@@ -7,7 +9,9 @@ class SideNode{
         this.angle = 0;
         this.targetAngle = 0;
         this.position = {x: 0, y: 0};
-        this.radius = 350;
+
+        let smallerside = Math.min(getWidth(),getHeight());
+        this.radius = smallerside * 0.3;
         this.dataCount = 0;
 
         this.timeOffset = Math.random() * 20;

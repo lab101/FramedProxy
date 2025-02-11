@@ -14,7 +14,7 @@ function setupCanvas(canvas,width,height){
     }
 
     let dpr = window.devicePixelRatio || 1;
-    dpr =1;
+    //dpr =1;
     console.log(`dpr: ${dpr}`)
 
     canvas.width = width * dpr;
@@ -31,4 +31,12 @@ function setupCanvas(canvas,width,height){
     return ctx;
 }
 
-export { setupCanvas };
+function getHeight(){
+    return window.innerHeight;
+}
+
+function getWidth(){
+    return window.innerWidth * ( 1);
+}
+
+export { setupCanvas, getHeight, getWidth };

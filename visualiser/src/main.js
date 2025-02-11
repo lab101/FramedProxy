@@ -1,7 +1,7 @@
 import './style.css'
 
 import SiteNode from './SiteNode.js'
-import  { setupCanvas } from './helpers/CanvasHelper.js'
+import  { getHeight, getWidth, setupCanvas } from './helpers/CanvasHelper.js'
 
 const canvas = document.getElementById('canvas')
 const ctx = canvas.getContext('2d')
@@ -29,12 +29,12 @@ function draw() {
     ctx.fillStyle = 'black'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
     ctx.save()
-    ctx.translate(canvas.width/2, canvas.height/2)
+    ctx.translate(getWidth()/2, getHeight()/2)
 
-
-    // ctx.stroke();
 
     let deltaTime = performance.now() - lastTime;
+    deltaTime = Math.min(deltaTime, 1.0/30.0 * 1000);
+
     lastTime = performance.now();
     for(let i = 0; i < sites.length; i++){
 
@@ -67,14 +67,14 @@ function draw() {
             for(let k = 0; k < sites[i].sendList.length; k++){
               let t = sites[i].sendList[k][0];
               let color = sites[i].sendList[k][2];
-              console.log(color);
+             // console.log(color);
               let x3 = x + (x2 - x) * t;
               let y3 = y + (y2 - y) * t;
               ctx.beginPath();
               ctx.ellipse(x3,y3,2,2,0,0,2 * Math.PI);
               if(color){
                 ctx.fillStyle = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
-                console.log("rgb(" + color[0] + "," + color[1] + "," + color[2] + ")");
+               // console.log("rgb(" + color[0] + "," + color[1] + "," + color[2] + ")");
               }
 
               ctx.globalAlpha = 1;//sites[i].sendList[k][1] * 2;
@@ -106,7 +106,7 @@ function draw() {
 
 // connect to websocket
 //const socketUrl = `ws://${window.location.hostname}:6007`;
-const socketUrl = `ws://framedproxy.lab101.be:6007`;
+const socketUrl = `ws://framedproxy.lab101.be/monitor`;
 var ws = 0;
 
 ws = new WebSocket(socketUrl);
