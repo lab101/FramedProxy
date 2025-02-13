@@ -168,6 +168,10 @@ function addSite(site){
   // newSite.siteName = site.siteName;
   newSite.siteGeoLocation = site.siteGeoLocation.country;
   newSite.ip = site.ip;
+  newSite.lineCount = site.lineCount;
+  newSite.circleCount = site.circleCount;
+  newSite.rectangleCount = site.rectangleCount;
+
   newSite.color = colors[colorIndex];
   colorIndex++;
   if(colorIndex >= colors.length){
