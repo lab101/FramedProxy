@@ -32,6 +32,10 @@ if(process.argv.includes("-v")){
 
 
 
+setInterval(function(){
+  sendAllSites();
+}, 5000);
+
 
 
 //addSite("109.137.244.226");
@@ -53,6 +57,8 @@ function findSite(ip){
     site.siteGeoLocation =  lookup(site.ip);
     activeSites.push(site);
     sendAllSites();
+
+    return site;
 }
 
 function removeSite(ip){
@@ -144,7 +150,11 @@ wss.on('connection', function connection(ws,req) {
 
     var adress =  ws.realip;
 
-    const site = findSite(adress);
+    let site = findSite(adress);
+    if(site == null){
+      site = addSite(adress);
+    }
+
 
     let oscMessage = osc.readPacket(data,{"metadata": true, "unpackSingleArgs": true});
     let fwdData = new Object();
@@ -159,14 +169,21 @@ wss.on('connection', function connection(ws,req) {
       fwdData[0] = Math.floor(r*255);
       fwdData[1] = Math.floor(g*255);
       fwdData[2] = Math.floor(b*255);
-    }
 
-    if(site != null){
-      site.dataCount++;
-      sendDataToMonitor(adress,"send",fwdData);
-    }else{
-      addSite(adress);
+      site.lineCount++;
+      
+    }else if(oscMessage.address == "/shape"){
+      const shapeType = oscMessage.args[2].value;
+
+      if(shapeType == "circle"){
+        site.circleCount++;
+      }else if(shapeType == "rectangle"){
+        site.rectangleCount++;
+      }
     }
+    
+
+    sendDataToMonitor(adress,"send",fwdData);
 
     wss.clients.forEach(function each(client) {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
@@ -214,14 +231,12 @@ wss.on('connection', function connection(ws,req) {
 
 // setTimeout(function(){
 
-//     // ipinfoWrapper.lookupIp(site.ip).then((ipinfo) => {
-//   //   site2.siteGeoLocation = ipinfo;
-//   //   activeSites.push(site2);
-//   //   sendAllSites();
-//   // });
+//   for(var i = 0; i < 5; i++){
 
-//   for(var i = 0; i < rndNr; i++){
-//     AddSite(firstIp + ".137.244" + "." + ipLast);
+//     const firstIp = 100+  Math.floor(Math.random() * 105);
+//     const ipLast = 206 + i;
+
+//     addSite(firstIp + ".137.244" + "." + ipLast);
 //   }
 
 //   console.log(activeSites.length);

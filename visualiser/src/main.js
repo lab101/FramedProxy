@@ -11,7 +11,7 @@ setupCanvas(canvas)
 
 
 let sites = [];
-let colors = ['#00E0AA','#E0A900','#009CE0','#E07800','#2E708B','#E306155'];
+let colors = ['#0000FF','#00a564','#ed1c25','#ff6e00','#6dcff6','#f7ec0f','#ccbcff','#ff00ff','#7e3a20'];
 let colorIndex = 0;
 
 // setup render loop  
@@ -47,47 +47,7 @@ function draw() {
 
       if(sites[i].sendList.length > 0){
 
-        for(let j = 0; j < sites.length; j++){
-          if(i != j){
-            ctx.beginPath();
-
-            let angle = Math.atan2(sites[j].position.y - sites[i].position.y, sites[j].position.x - sites[i].position.x);
-            let x = sites[i].position.x + Math.cos(angle) * 60;
-            let y = sites[i].position.y + Math.sin(angle) * 60;
-
-            let x2 = sites[j].position.x - Math.cos(angle) * 60;
-            let y2 = sites[j].position.y - Math.sin(angle) * 60;
-
-            ctx.moveTo(x,y);
-            ctx.lineTo(x2,y2);
-            ctx.globalAlpha = 0.2;
-            ctx.stroke();
-            ctx.globalAlpha = 1;
-
-            for(let k = 0; k < sites[i].sendList.length; k++){
-              let t = sites[i].sendList[k][0];
-              let color = sites[i].sendList[k][2];
-             // console.log(color);
-              let x3 = x + (x2 - x) * t;
-              let y3 = y + (y2 - y) * t;
-              ctx.beginPath();
-              ctx.ellipse(x3,y3,2,2,0,0,2 * Math.PI);
-              if(color){
-                ctx.fillStyle = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
-               // console.log("rgb(" + color[0] + "," + color[1] + "," + color[2] + ")");
-              }
-
-              ctx.globalAlpha = 1;//sites[i].sendList[k][1] * 2;
-              ctx.fill();
-
-            }
-
-
-            // ctx.moveTo(x,y);
-            // ctx.lineTo(x2,y2);
-            // ctx.stroke()
-          }
-        }
+          drawDataLines(i,ctx,deltaTime);
         
       }
 
@@ -102,6 +62,60 @@ function draw() {
     ctx.restore()
 }
 
+
+  function drawDataLines(i,ctx,deltaTime){
+
+    const marginAroundCircle = 60;
+    for(let j = 0; j < sites.length; j++){
+      if(i != j){
+        ctx.beginPath();
+
+        
+
+        let angle = Math.atan2(sites[j].position.y - sites[i].position.y, sites[j].position.x - sites[i].position.x);
+        let x = sites[i].position.x + Math.cos(angle) * marginAroundCircle;
+        let y = sites[i].position.y + Math.sin(angle) * marginAroundCircle;
+
+        let x2 = sites[j].position.x - Math.cos(angle) * marginAroundCircle;
+        let y2 = sites[j].position.y - Math.sin(angle) * marginAroundCircle;
+
+        ctx.moveTo(x,y);
+        ctx.lineTo(x2,y2);
+        ctx.globalAlpha = 0.2;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        for(let k = 0; k < sites[i].sendList.length; k++){
+          let time = sites[i].sendList[k][0];
+          let color = sites[i].sendList[k][2];
+
+          let x3 = x + (x2 - x) * time;
+          let y3 = y + (y2 - y) * time;
+
+          // calculate perpindicular line
+          let perpAngle = angle + Math.PI/2;
+          let offset = sites[i].sendList[k][3];
+
+          let x4 = x3 + Math.cos(perpAngle) * offset;
+          let y4 = y3 + Math.sin(perpAngle) * offset;
+
+
+          //ctx.beginPath();
+          //ctx.ellipse(x4,y4,1,1,0,0,2 * Math.PI);
+          ctx.fillRect(x4,y4,2,2);
+          if(color){
+            ctx.fillStyle = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
+          }
+
+         // ctx.fill();
+
+        }
+        ctx.globalAlpha = 1;
+
+
+      }
+    }
+  }
 
 
 // connect to websocket
@@ -131,10 +145,10 @@ render()
 function existingSite(site){
   for(let i = 0; i < sites.length; i++){
     if(sites[i].ip == site.ip){
-      return true;
+      return sites[i];
     }
   }
-  return false;
+  return null;
 }
 
 function setAngles(){
@@ -164,6 +178,17 @@ function addSite(site){
 }
 
 
+function updateSite(existingSite, newSite){
+
+  existingSite.ip = newSite.ip;
+  existingSite.lineCount = newSite.lineCount;
+  existingSite.circleCount = newSite.circleCount;
+  existingSite.rectangleCount = newSite.rectangleCount;
+
+}
+
+
+
 
 function getNodeByIp(ip){
   for(let i = 0; i < sites.length; i++){
@@ -189,11 +214,13 @@ function processPackage(data){
   if(data.action == 'all'){
  
     for(let i = 0; i < data.sites.length; i++){
-      let newSite = data.sites[i];
+      let incomingSite = data.sites[i];
       // check if new site is already in the list
-      let found = existingSite(newSite);
-      if(!found){
-        addSite(newSite);
+      let foundSite = existingSite(incomingSite);
+      if(!foundSite){
+        addSite(incomingSite);
+      }else{
+        updateSite(foundSite,incomingSite);
       }
     }
 

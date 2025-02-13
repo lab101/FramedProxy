@@ -10,6 +10,10 @@ class SideNode{
         this.targetAngle = 0;
         this.position = {x: 0, y: 0};
 
+        this.lineCount = 0;
+        this.circleCount = 0;
+        this.rectangleCount = 0;
+
         let smallerside = Math.min(getWidth(),getHeight());
         this.radius = smallerside * 0.3;
         this.dataCount = 0;
@@ -21,6 +25,39 @@ class SideNode{
 
         this.sendList = [];
 
+        this.colorCountDictonary = {};
+
+      //  this.fakeSend();
+
+    }
+
+    fakeSend(){
+        let color =[Math.floor(Math.random() * 255),Math.floor(Math.random() * 255),Math.floor(Math.random() * 255)];
+
+        let amount = 1 + Math.floor(Math.random() * 150);
+
+        for(let i = 0; i < amount; i++){
+            setTimeout(() => {
+            this.sending(color);
+            }, i * 10);
+        }
+
+        let rndTime = 1000 + Math.random() * 20000;
+        setTimeout(() => {
+            this.fakeSend();    
+        }, rndTime);
+
+    }
+
+
+    formatCount(count){
+        if(count > 1000000){
+            return Math.floor(count / 1000000) + "M";
+        }else if(count > 1000){
+            return Math.floor(count / 1000) + "K";
+        }else{
+            return count;
+        }
     }
 
     draw(ctx,deltaTime){
@@ -60,6 +97,26 @@ class SideNode{
         ctx.font = "8px sans-serif";
         ctx.fillText(this.ip,x,y+16);
 
+        ctx.fillText(this.formatCount(this.lineCount),x +80,y-10);
+        ctx.fillText(this.formatCount(this.circleCount),x +80,y+0);
+        ctx.fillText(this.formatCount(this.rectangleCount),x +80,y+10);
+
+        ctx.fillStyle = "white";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(x + 65,y,4,4,0,0,2 * Math.PI);
+
+        ctx.rect(x + 62,y +10,6,6);
+
+        // draw line
+        ctx.moveTo(x + 61,y-14);
+        ctx.lineTo(x + 67,y-10);
+
+        ctx.stroke();
+
+
+
+
 
         for(let i = 0; i < this.sendList.length; i++){
             const speed = this.sendList[i][1];
@@ -72,9 +129,13 @@ class SideNode{
 
       sending(color){
         const rndSpeed = 0.2 + Math.random() * 0.2;
-        this.sendList.push([0,rndSpeed,color]);
+        const margin = 16;
+        const rndDistance = -margin + Math.random() * (margin*2);
+        this.sendList.push([0,rndSpeed,color,rndDistance]);
 
       }
+
+      
 }
 
 export default SideNode;
