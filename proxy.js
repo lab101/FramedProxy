@@ -7,6 +7,8 @@ import osc from 'osc';
 
 import SiteData from './classes/SiteData.js';
 
+import { logToFile,logPerHour,logToFileAndConsole } from './LogHelper.js';
+
 const port = process.env.PORT || 6006
 const portMonitor = process.env.PORT || 6007
 
@@ -34,8 +36,12 @@ if(process.argv.includes("-v")){
 
 setInterval(function(){
   sendAllSites();
-}, 5000);
+}, 3000);
 
+setInterval(function(){
+  const textToLog = JSON.stringify(activeSites);
+  logPerHour(textToLog);
+}, 3000);
 
 
 //addSite("109.137.244.226");
@@ -52,6 +58,8 @@ function findSite(ip){
 
  function addSite(ip){
     console.log("add site: " + ip);
+
+    logToFileAndConsole("add site: " + ip);
     var site = new SiteData();
     site.ip = ip;
     site.siteGeoLocation =  lookup(site.ip);
@@ -62,7 +70,7 @@ function findSite(ip){
 }
 
 function removeSite(ip){
-  console.log("remove site: " + ip);
+  logToFileAndConsole("remove site: " + ip);
   for(var i = 0; i < activeSites.length; i++){
     if(activeSites[i].ip == ip){
       activeSites.splice(i,1);
