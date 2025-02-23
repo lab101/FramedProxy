@@ -97,9 +97,9 @@ class SideNode{
         ctx.font = "8px sans-serif";
         ctx.fillText(this.ip,x,y+16);
 
-        ctx.fillText(this.formatCount(this.lineCount),x +80,y-10);
+        ctx.fillText(this.formatCount(this.lineCount),x +80,y-13);
         ctx.fillText(this.formatCount(this.circleCount),x +80,y+0);
-        ctx.fillText(this.formatCount(this.rectangleCount),x +80,y+12);
+        ctx.fillText(this.formatCount(this.rectangleCount),x +80,y+13);
 
         ctx.fillStyle = "white";
         ctx.lineWidth = 2;
