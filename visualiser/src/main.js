@@ -206,11 +206,12 @@ function getNodeByIp(ip){
 
 function sendDataFromNode(data){
 
-  let node = getNodeByIp(data.ip);
-  if(node){
-    console.log('sending from node')
-    node.sending(data.data);
-  }
+    if (document.hasFocus()) {
+      let node = getNodeByIp(data.ip);
+      if(node){
+        node.sending(data.data);
+      }    
+    } 
 }
 
 

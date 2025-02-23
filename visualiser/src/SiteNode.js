@@ -125,6 +125,7 @@ class SideNode{
       }
 
       sending(color){
+
         const rndSpeed = 0.2 + Math.random() * 0.2;
         const margin = 16;
         const rndDistance = -margin + Math.random() * (margin*2);
