@@ -94,7 +94,7 @@ function setupCallbacks(){
         try {
             oscMessage = osc.readPacket(data,{"metadata": true, "unpackSingleArgs": true});
             //console.log(oscMessage);
-            console.log('\x1b[34m%s\x1b[0m', 'Incoming remote message');
+            console.log('\x1b[34m%s\x1b[0m', 'Incoming remote websocket message ' + oscMessage.address);
     
             udpPort.send(oscMessage);
     
@@ -109,11 +109,11 @@ function setupCallbacks(){
 
 // Listen for incoming OSC messages.
 udpPort.on("message", function (oscMsg, timeTag, info) {
-    //console.log("An OSC message just arrived!", oscMsg);
-    console.log("Remote info is: ", info);
+//    console.log("Remote info is: ", info);
 
+    // block broadcast messages which where send from this machine
     if(localIps.includes(info.address)){
-        console.log("block bounced broadcast message");
+        //console.log("block bounced broadcast message " + info.address);
     }else{
         console.log('\x1b[32m%s\x1b[0m', "incoming osc from " + info.address + " - " + oscMsg.address);
         var bin = osc.writePacket(oscMsg,{"metadata": true, "unpackSingleArgs": true});

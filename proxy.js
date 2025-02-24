@@ -193,12 +193,16 @@ wss.on('connection', function connection(ws,req) {
 
     sendDataToMonitor(adress,"send",fwdData);
 
+    let counter = 0;
     wss.clients.forEach(function each(client) {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
         client.send(data, { binary: isBinary });
+        counter++;
       }else{
       }
     });
+
+    console.log(adress +  " forwarded to " + counter + " clients");
   });
 });
 
