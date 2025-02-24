@@ -182,23 +182,29 @@ let brightness = 50;
 let angle = 0;
 let radius = 1080/2;
 let time=0;
+let frameId = 0;
 
 setInterval(() => {
     if(ws!=0 && ws.readyState == WebSocket.OPEN){
         // send osc message
         xPos += 20;
-        angle += 0.01;
+        angle += 0.2;
       
 
-        hue = (hue + 0.02) % 360;
+        hue = 30 + (Math.sin(time*0.1)) * 40;
+        hue = hue % 360;
         time += 0.01;
+
+        brightness = Math.abs(Math.sin(time*0.1)) * 100;
         
-        radius = Math.abs(Math.sin(time*0.01)) * 1080/2;
+        radius = Math.abs(Math.sin(time*0.04)) * 1080/2;
         radius = Math.round(radius/10)*10;
 
 
 
-        let frameId = Math.abs(Math.sin(time*4)) * 24;
+       // let frameId = Math.abs(Math.sin(time*4)) * 24;
+        frameId+=1;
+        if(frameId>24) frameId = 0;
 
         let rgb = HSB2RGB(hue,sat,brightness);
         red = rgb[0]/255;
@@ -237,9 +243,9 @@ setInterval(() => {
             ]
         };
 
-        for(var i = 0; i < 20; i++){
+        for(var i = 0; i < 80; i++){
 
-            let tmpAngle = angle + i * 0.01;
+            let tmpAngle = angle + i * 0.04;
             let x = 1920/2 + Math.cos(tmpAngle) * radius;
             let y = 1080/2 + Math.sin(tmpAngle) * radius;
 
@@ -262,7 +268,7 @@ setInterval(() => {
        
     }else{
     }
-}, 10);
+}, 100);
 
 
 
@@ -280,7 +286,7 @@ setInterval(() => {
         radius = Math.round(radius/10)*10;
 
 
-        let frameId = Math.abs(Math.sin(time*0.5)) * 24;
+        let frameId = Math.abs(Math.sin((time+20)*4)) * 24;
        
 
         var msg = {
@@ -339,4 +345,4 @@ setInterval(() => {
        
     }else{
     }
-}, 40);
+}, 4000);
