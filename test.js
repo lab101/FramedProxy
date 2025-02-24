@@ -176,7 +176,7 @@ let green = 0;
 let blue = 0;
 
 let hue = 0;
-let sat = 50;
+let sat = 80;
 let brightness = 50;
 
 let angle = 0;
@@ -188,18 +188,26 @@ setInterval(() => {
     if(ws!=0 && ws.readyState == WebSocket.OPEN){
         // send osc message
         xPos += 20;
-        angle += 0.2;
+        angle += (radius/2080);
       
 
-        hue = 60 + (Math.sin(time*0.2)) * 40;
+        hue = 30 + (Math.sin(time*0.2)) * 2;
         hue = hue % 360;
         time += 0.01;
 
-        brightness =Math.abs(Math.sin(time*20.4)) * 100;
-        sat = Math.abs(Math.sin(time*1.4)) * 100;
+        if(Math.abs(Math.sin(time*0.4)) < 0.15){
+            hue = 340;
+        }
+
+        brightness =Math.abs(Math.sin(time*2.1)) * 1;
+        if(brightness < 0.5) brightness = 0;
+        else brightness *= 1.5;
+
+        sat = Math.abs(Math.sin(time*1.4)) * 1;
         
         radius = Math.abs(Math.sin(time*0.04)) * 1080/2;
         radius = Math.round(radius/10)*10;
+
 
 
 
@@ -244,9 +252,21 @@ setInterval(() => {
             ]
         };
 
-        for(var i = 0; i < 80; i++){
+        let thickness = Math.abs(Math.sin(time*.0887)) 
+        let length = 20 +  Math.abs(Math.sin(time*0.1)) * 100;
 
-            let tmpAngle = angle + i * (4/radius);
+        if(thickness < 0.5) thickness = 10;
+        else if(thickness > 0.998) {
+            thickness = 2;
+            length = 105;
+        }
+        else( thickness = 4);
+
+        if(brightness ==0) thickness = 20;
+
+        for(var i = 0; i < length; i++){
+
+            let tmpAngle = angle + i * (0.4/radius*thickness);
             let x = 1920/2 + Math.cos(tmpAngle) * radius;
             let y = 1080/2 + Math.sin(tmpAngle) * radius;
 
@@ -260,7 +280,7 @@ setInterval(() => {
             });
             msg.args.push({
                 type: "f",
-                value: 10,
+                value: thickness,
             });
         }
 
@@ -269,81 +289,8 @@ setInterval(() => {
        
     }else{
     }
-}, 10);
+}, 20);
 
 
 
-let angle2 = 0;
-let time2 = 0;
 
-setInterval(() => {
-    if(ws!=0 && ws.readyState == WebSocket.OPEN){
-        // send osc message
-        angle2 = angle;
-      
-        //time += 0.01;
-
-        radius = Math.abs(Math.sin(time*0.01)) * 1080/2;
-        radius = Math.round(radius/10)*10;
-
-
-        let frameId = Math.abs(Math.sin((time+20)*4)) * 24;
-       
-
-        var msg = {
-            address: "/points",
-            args: [
-                {
-                    type: "i", // group id
-                    value: "1"
-                },
-                {
-                    type: "i", // frame id
-                    value: frameId
-                },
-                {
-                    type: "F", // eraser on
-                    value: "0"
-                },
-                {
-                    type: "f", // color r
-                    value: 0
-                },
-                {
-                    type: "f", // color g
-                    value: 0
-                },
-                {
-                    type: "f", // color b
-                    value: 0
-                },
-                
-            ]
-        };
-
-        for(var i = 0; i < 40; i++){
-
-            let tmpAngle = angle2 + i * 0.02;
-            let x = 1920/2 + Math.cos(tmpAngle) * radius;
-            let y = 1080/2 + Math.sin(tmpAngle) * radius;
-
-            msg.args.push({
-                type: "f",
-                value: x,
-            });
-            msg.args.push({
-                type: "f",
-                value: y,
-            });
-            msg.args.push({
-                type: "f",
-                value: 20,
-            });
-        }
-
-        var bin = osc.writePacket(msg,{"metadata": true, "unpackSingleArgs": true});
-        ws.send(bin);
-       
-    }else{
-    }
-}, 4000);
