@@ -253,12 +253,12 @@ setInterval(() => {
         };
 
         let thickness = Math.abs(Math.sin(time*.0887)) 
-        let length = 20 +  Math.abs(Math.sin(time*0.1)) * 100;
+        let length = 20 +  Math.abs(Math.sin(time*0.1)) * 60;
 
         if(thickness < 0.5) thickness = 10;
         else if(thickness > 0.998) {
             thickness = 2;
-            length = 105;
+            length = 60;
         }
         else( thickness = 4);
 
