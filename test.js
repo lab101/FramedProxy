@@ -191,11 +191,12 @@ setInterval(() => {
         angle += 0.2;
       
 
-        hue = 30 + (Math.sin(time*0.1)) * 40;
+        hue = 60 + (Math.sin(time*0.2)) * 40;
         hue = hue % 360;
         time += 0.01;
 
-        brightness = Math.abs(Math.sin(time*0.1)) * 100;
+        brightness =Math.abs(Math.sin(time*20.4)) * 100;
+        sat = Math.abs(Math.sin(time*1.4)) * 100;
         
         radius = Math.abs(Math.sin(time*0.04)) * 1080/2;
         radius = Math.round(radius/10)*10;
@@ -245,7 +246,7 @@ setInterval(() => {
 
         for(var i = 0; i < 80; i++){
 
-            let tmpAngle = angle + i * 0.04;
+            let tmpAngle = angle + i * (4/radius);
             let x = 1920/2 + Math.cos(tmpAngle) * radius;
             let y = 1080/2 + Math.sin(tmpAngle) * radius;
 
@@ -268,7 +269,7 @@ setInterval(() => {
        
     }else{
     }
-}, 100);
+}, 10);
 
 
 
